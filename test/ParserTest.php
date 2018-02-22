@@ -11,6 +11,19 @@ class ParserTest extends TestCase
         $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
+    public function testVariousLineTerminators()
+    {
+        // CRLF
+        $content = "WEBVTT\u{000D}\u{000A}\u{000D}\u{000A}";
+        $this->assertEquals((new Parser())->parse($content), self::empty_result());
+        // LF
+        $content = "WEBVTT\u{000A}\u{000A}";
+        $this->assertEquals((new Parser())->parse($content), self::empty_result());
+        // CR
+        $content = "WEBVTT\u{000D}\u{000D}";
+        $this->assertEquals((new Parser())->parse($content), self::empty_result());
+    }
+
     function testIgnoreBOM()
     {
         $bom = chr(239) . chr(187) . chr(191);

@@ -20,6 +20,13 @@ class Parser {
 		$this->content = $content;
 		$this->messages = [];
 
+		// NULL -> REPLACEMENT
+		$this->content = str_replace("\u{0000}", "\u{FFFD}", $this->content);
+		// CRLF -> LF
+		$this->content = str_replace(self::CR . self::LF, self::LF, $this->content);
+		// CR -> LF
+		$this->content = str_replace(self::CR, self::LF, $this->content);
+
 		$this->skip_bom();
 		$this->skip_signature();
 		$this->skip_signature_trails();
@@ -54,7 +61,7 @@ class Parser {
 	{
 		if (in_array(substr($this->content, $this->pos, 1), [self::SPACE, self::TAB])) {
 			$this->pos++;
-			while (!in_array(substr($this->content, $this->pos, 1), [self::CR, self::LF]) && !$this->is_end_reached()) {
+			while (substr($this->content, $this->pos, 1) !== self::LF && !$this->is_end_reached()) {
 			    $this->pos++;
 			}
 		}
@@ -66,10 +73,7 @@ class Parser {
 
 	private function skip_line_terminator()
 	{
-		if (substr($this->content, $this->pos, 2) === self::CR . self::LF) {
-			$this->pos += 2;
-			$this->line++;
-		} else if (substr($this->content, $this->pos, 1) === self::LF || substr($this->content, $this->pos, 1) === self::CR) {
+		if (substr($this->content, $this->pos, 1) === self::LF) {
 			$this->pos += 1;
 			$this->line++;
 		} else {
