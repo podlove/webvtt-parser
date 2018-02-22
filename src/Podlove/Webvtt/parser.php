@@ -21,8 +21,8 @@ class Parser {
 		$this->messages = [];
 
 		$this->skip_bom();
-		$this->skip_webvtt();
-		// $this->skip_webvtt_trails();
+		$this->skip_signature();
+		$this->skip_signature_trails();
 		$this->skip_line_terminator();
 		$this->skip_line_terminator();
 
@@ -41,7 +41,7 @@ class Parser {
 		}
 	}
 
-	private function skip_webvtt()
+	private function skip_signature()
 	{
 		if (substr($this->content, $this->pos, 6) == "WEBVTT") {
 			$this->pos += 6;
@@ -50,11 +50,18 @@ class Parser {
 		}		
 	}
 
-	private function skip_webvtt_trails()
+	private function skip_signature_trails()
 	{
-		// if (in_array(substr($this->content, $pos, 1), [$space, $tab])) {
-		// 	$this->pos++;
-		// }
+		if (in_array(substr($this->content, $this->pos, 1), [self::SPACE, self::TAB])) {
+			$this->pos++;
+			while (!in_array(substr($this->content, $this->pos, 1), [self::CR, self::LF]) && !$this->is_end_reached()) {
+			    $this->pos++;
+			}
+		}
+	}
+
+	private function is_end_reached() {
+		return $this->pos + 1 >= strlen($this->content);
 	}
 
 	private function skip_line_terminator()

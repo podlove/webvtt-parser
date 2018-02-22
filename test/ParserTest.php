@@ -18,6 +18,12 @@ class ParserTest extends TestCase
         $this->assertEquals((new Parser())->parse($bom . $content), self::empty_result());
     }
 
+    public function testIgnoreStuffAfterSignature()
+    {
+        $content = "WEBVTT bla bla\u{000A}\u{000A}";
+        $this->assertEquals((new Parser())->parse($content), self::empty_result());
+    }
+
     function testMissingWEBVTT()
     {
         $result = (new Parser())->parse("");
