@@ -11,7 +11,7 @@ class ParserTest extends TestCase
 WEBVTT
 
 DOC;
-        $this->assertEquals(Parser::parse($content), self::empty_result());
+        $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
     function testIgnoreBOM()
@@ -21,12 +21,12 @@ DOC;
 WEBVTT
 
 DOC;
-        $this->assertEquals(Parser::parse($bom . $content), self::empty_result());
+        $this->assertEquals((new Parser())->parse($bom . $content), self::empty_result());
     }
 
     function testMissingWEBVTT()
     {
-        $this->assertEquals(Parser::parse(""), [
+        $this->assertEquals((new Parser())->parse(""), [
             'result' => [],
             'messages' => ["Missing WEBVTT at beginning of file."]
         ]);

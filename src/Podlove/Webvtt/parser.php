@@ -2,26 +2,41 @@
 namespace Podlove\Webvtt;
 
 class Parser {
-	public static function parse($str)
+
+	private $pos;
+	private $content;
+	private $messages;
+
+	public function parse($content)
 	{
-		$pos = 0;
-		$messages = [];
+		$this->pos = 0;
+		$this->content = $content;
+		$this->messages = [];
 
-		// skip optional BOM
-		$bom = chr(239) . chr(187) . chr(191);
-		if (substr($str, $pos, 3) == $bom) {
-			$pos += 3;
-		}
-
-		if (substr($str, $pos, 6) == "WEBVTT") {
-			$pos += 6;
-		} else {
-			$messages[] = "Missing WEBVTT at beginning of file.";
-		}
+		$this->skip_bom();
+		$this->skip_webvtt();
 
 		return [
 			'result' => [],
-			'messages' => $messages
+			'messages' => $this->messages
 		];
+	}
+
+	private function skip_bom()
+	{
+		$bom = chr(239) . chr(187) . chr(191);
+		
+		if (substr($this->content, $this->pos, 3) == $bom) {
+			$this->pos += 3;
+		}
+	}
+
+	private function skip_webvtt()
+	{
+		if (substr($this->content, $this->pos, 6) == "WEBVTT") {
+			$this->pos += 6;
+		} else {
+			$this->messages[] = "Missing WEBVTT at beginning of file.";
+		}		
 	}
 }
