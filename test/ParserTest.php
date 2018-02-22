@@ -59,7 +59,7 @@ class ParserTest extends TestCase
     private static function empty_result()
     {
         return [
-            'result' => []
+            'cues' => []
         ];
     }
 }

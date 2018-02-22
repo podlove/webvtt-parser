@@ -42,7 +42,7 @@ class Parser {
 		$this->skip_line_terminator();
 
 		return [
-			'result' => []
+			'cues' => []
 		];
 	}
 
