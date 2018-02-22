@@ -2,6 +2,7 @@
 use PHPUnit\Framework\TestCase;
 
 use Podlove\Webvtt\Parser;
+use Podlove\Webvtt\ParserException;
 
 class ParserTest extends TestCase
 {
@@ -37,17 +38,28 @@ class ParserTest extends TestCase
         $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
-    function testMissingWEBVTT()
+    /**
+     * @expectedException \Podlove\Webvtt\ParserException
+     * @expectedExceptionMessage Missing WEBVTT at beginning of file
+     **/
+    public function testMissingWEBVTT()
     {
         $result = (new Parser())->parse("");
-        $this->assertEquals($result['messages'][0], "Missing WEBVTT at beginning of file.");
+    }
+
+    /**
+     * @expectedException \Podlove\Webvtt\ParserException
+     * @expectedExceptionMessage Expected line terminator
+     **/
+    public function testMissingLineTerminator()
+    {
+        $result = (new Parser())->parse("WEBVTT");
     }
 
     private static function empty_result()
     {
         return [
-            'result' => [],
-            'messages' => []
+            'result' => []
         ];
     }
 }

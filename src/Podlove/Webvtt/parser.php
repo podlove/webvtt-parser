@@ -1,12 +1,21 @@
 <?php
 namespace Podlove\Webvtt;
 
+class ParserException extends \Exception {
+
+}
+
+/**
+ * NOTES
+ * 
+ * - build a generic "error message, position, line, expected ... but got ..." reporting routine
+ * - this is great: https://w3c.github.io/webvtt/
+ */
 class Parser {
 
 	private $pos;
 	private $line;
 	private $content;
-	private $messages;
 
 	const LF    = "\u{000A}";
 	const CR    = "\u{000D}";
@@ -18,7 +27,6 @@ class Parser {
 		$this->pos = 0;
 		$this->line = 1;
 		$this->content = $content;
-		$this->messages = [];
 
 		// NULL -> REPLACEMENT
 		$this->content = str_replace("\u{0000}", "\u{FFFD}", $this->content);
@@ -34,8 +42,7 @@ class Parser {
 		$this->skip_line_terminator();
 
 		return [
-			'result' => [],
-			'messages' => $this->messages
+			'result' => []
 		];
 	}
 
@@ -58,7 +65,7 @@ class Parser {
 		if ($this->next(6) == "WEBVTT") {
 			$this->pos += 6;
 		} else {
-			$this->messages[] = "Missing WEBVTT at beginning of file.";
+			throw new ParserException("Missing WEBVTT at beginning of file.");
 		}		
 	}
 
@@ -82,7 +89,7 @@ class Parser {
 			$this->pos += 1;
 			$this->line++;
 		} else {
-			$this->messages[] = "Expected line terminator at line {$this->line}";
+			throw new ParserException("Expected line terminator at line {$this->line}");
 		}
 	}
 }
