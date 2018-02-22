@@ -39,18 +39,23 @@ class Parser {
 		];
 	}
 
+	private function next($length = 1)
+	{
+		return substr($this->content, $this->pos, $length);
+	}
+
 	private function skip_bom()
 	{
 		$bom = chr(239) . chr(187) . chr(191);
 		
-		if (substr($this->content, $this->pos, 3) == $bom) {
+		if ($this->next(3) == $bom) {
 			$this->pos += 3;
 		}
 	}
 
 	private function skip_signature()
 	{
-		if (substr($this->content, $this->pos, 6) == "WEBVTT") {
+		if ($this->next(6) == "WEBVTT") {
 			$this->pos += 6;
 		} else {
 			$this->messages[] = "Missing WEBVTT at beginning of file.";
@@ -59,9 +64,9 @@ class Parser {
 
 	private function skip_signature_trails()
 	{
-		if (in_array(substr($this->content, $this->pos, 1), [self::SPACE, self::TAB])) {
+		if (in_array($this->next(), [self::SPACE, self::TAB])) {
 			$this->pos++;
-			while (substr($this->content, $this->pos, 1) !== self::LF && !$this->is_end_reached()) {
+			while ($this->next() !== self::LF && !$this->is_end_reached()) {
 			    $this->pos++;
 			}
 		}
@@ -73,7 +78,7 @@ class Parser {
 
 	private function skip_line_terminator()
 	{
-		if (substr($this->content, $this->pos, 1) === self::LF) {
+		if ($this->next() === self::LF) {
 			$this->pos += 1;
 			$this->line++;
 		} else {
