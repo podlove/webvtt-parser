@@ -7,29 +7,21 @@ class ParserTest extends TestCase
 {
     public function testEmpty()
     {
-        $content = <<<DOC
-WEBVTT
-
-DOC;
+        $content = "WEBVTT\u{000A}\u{000A}";
         $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
     function testIgnoreBOM()
     {
         $bom = chr(239) . chr(187) . chr(191);
-        $content = <<<DOC
-WEBVTT
-
-DOC;
+        $content = "WEBVTT\u{000A}\u{000A}";
         $this->assertEquals((new Parser())->parse($bom . $content), self::empty_result());
     }
 
     function testMissingWEBVTT()
     {
-        $this->assertEquals((new Parser())->parse(""), [
-            'result' => [],
-            'messages' => ["Missing WEBVTT at beginning of file."]
-        ]);
+        $result = (new Parser())->parse("");
+        $this->assertEquals($result['messages'][0], "Missing WEBVTT at beginning of file.");
     }
 
     private static function empty_result()
