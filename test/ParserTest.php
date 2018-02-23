@@ -8,7 +8,7 @@ class ParserTest extends TestCase
 {
     public function testEmpty()
     {
-        $content = "WEBVTT\u{000A}\u{000A}";
+        $content = "WEBVTT\n\n";
         $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
@@ -28,26 +28,37 @@ class ParserTest extends TestCase
     function testIgnoreBOM()
     {
         $bom = chr(239) . chr(187) . chr(191);
-        $content = "WEBVTT\u{000A}\u{000A}";
+        $content = "WEBVTT\n\n";
         $this->assertEquals((new Parser())->parse($bom . $content), self::empty_result());
     }
 
     public function testIgnoreStuffAfterSignature()
     {
-        $content = "WEBVTT bla bla\u{000A}\u{000A}";
+        $content = "WEBVTT bla bla\n\n";
         $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
     public function testSimpleCue()
     {
-        $content = "WEBVTT\u{000A}\u{000A}00:00:00.000 --> 01:22:33.440
-Hello world\u{000A}";
+        $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
+Hello world\n";
         $result = (new Parser())->parse($content);
 
         $this->assertEquals($result['cues'][0]['text'], "Hello world");
         $this->assertEquals($result['cues'][0]['start'], 0);
         $this->assertEquals($result['cues'][0]['end'], 4953.44);
     }
+
+//     public function testMultipleCues()
+//     {
+//         $content = "WEBVTT\u{000A}\u{000A}00:00:00.000 --> 01:22:33.440
+// Hello world\u{000A}";
+//         $result = (new Parser())->parse($content);
+
+//         $this->assertEquals($result['cues'][0]['text'], "Hello world");
+//         $this->assertEquals($result['cues'][0]['start'], 0);
+//         $this->assertEquals($result['cues'][0]['end'], 4953.44);
+//     }
 
     /**
      * @expectedException \Podlove\Webvtt\ParserException
