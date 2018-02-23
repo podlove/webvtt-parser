@@ -38,6 +38,17 @@ class ParserTest extends TestCase
         $this->assertEquals((new Parser())->parse($content), self::empty_result());
     }
 
+    public function testSimpleCue()
+    {
+        $content = "WEBVTT\u{000A}\u{000A}00:00:00.000 --> 01:22:33.440
+Hello world\u{000A}";
+        $result = (new Parser())->parse($content);
+
+        $this->assertEquals($result['cues'][0]['text'], "Hello world");
+        $this->assertEquals($result['cues'][0]['start'], 0);
+        $this->assertEquals($result['cues'][0]['end'], 4953.44);
+    }
+
     /**
      * @expectedException \Podlove\Webvtt\ParserException
      * @expectedExceptionMessage Missing WEBVTT at beginning of file
