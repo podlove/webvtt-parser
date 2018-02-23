@@ -8,7 +8,6 @@ class ParserException extends \Exception {
 /**
  * NOTES
  * 
- * - build a generic "error message, position, line, expected ... but got ..." reporting routine
  * - this is great: https://w3c.github.io/webvtt/
  */
 class Parser {
@@ -124,7 +123,7 @@ class Parser {
 		if ($this->next(3) == '-->') {
 			$this->pos += 3;
 		} else {
-			throw new ParserException("Expected \"-->\"  between Timestamps, got " . $this->next() . " at line {$this->line}, pos {$this->pos}");
+			$this->exit_expected("-->");
 		}		
 	}
 
@@ -133,7 +132,7 @@ class Parser {
 		$most_significant_units = 'minutes';
 
 		if (!self::is_ascii_digit($this->next())) {
-			throw new ParserException("Expected Timestamp, got " . $this->next() . " at line {$this->line}, pos {$this->pos}");
+			$this->exit_expected("digit");
 		}
 
 		$int = $this->read_integer();
@@ -161,10 +160,10 @@ class Parser {
 		$value4 = $this->read_n_digit_integer(3);
 
 		if ($value2 > 59) {
-			throw new ParserException("Error when parsing Timestamp: minutes > 59 at line {$this->line}");
+			$this->exit("Error when parsing Timestamp: minutes > 59");
 		}
 		if ($value3 > 59) {
-			throw new ParserException("Error when parsing Timestamp: seconds > 59 at line {$this->line}");
+			$this->exit("Error when parsing Timestamp: seconds > 59");
 		}
 
 		return $value1*60*60 + $value2*60 + $value3 + $value4/1000;
@@ -175,10 +174,24 @@ class Parser {
 		return preg_match("/^[0-9]$/", $digit) === 1;
 	}
 
+	private function exit($message = "Error")
+	{
+		throw new ParserException("$message at line {$this->line}, pos {$this->pos}");		
+	}
+
+	private function exit_expected($thing, $message = "")
+	{
+		if (strlen($message) > 0) {
+			$message = trim($message) . ". ";
+		}
+
+		throw new ParserException("{$message}Expected \"$thing\", got \"" . $this->next() . "\" at line {$this->line}, pos {$this->pos}");
+	}
+
 	private function read_integer()
 	{
 		if (!self::is_ascii_digit($this->next())) {
-			throw new ParserException("Error when parsing Timestamp: expected integer at line {$this->line}");
+			$this->exit_expected("integer", "Error when parsing Timestamp");
 		}
 
 		$buf = "";
@@ -197,7 +210,7 @@ class Parser {
 		$int = $this->read_integer();
 
 		if (strlen($int['str']) !== $n) {
-			throw new ParserException("Expected $n-digit integer in Timestamp at line {$this->line}");
+			$this->exit_expected("$n-digit integer", "Error when parsing Timestamp");
 		}
 
 		return $int['int'];
@@ -206,7 +219,7 @@ class Parser {
 	private function skip_full_stop()
 	{
 		if ($this->next() !== '.' || $this->is_end_reached()) {
-			throw new ParserException("Expected FULL STOP (.) in Timestamp at line {$this->line}");
+			$this->exit_expected("FULL STOP (.)", "Error when parsing Timestamp");
 		}
 		$this->pos++;			
 	}
@@ -214,7 +227,7 @@ class Parser {
 	private function skip_colon()
 	{
 		if ($this->next() !== ':' || $this->is_end_reached()) {
-			throw new ParserException("Expected COLON (:), got " . $this->next() . " in Timestamp at line {$this->line}");
+			$this->exit_expected("COLON (:)", "Error when parsing Timestamp");
 		}
 		$this->pos++;		
 	}
@@ -238,7 +251,7 @@ class Parser {
 		if ($this->next() === self::LF) {
 			$this->pos++;
 		} else {
-			throw new ParserException("Unexpected end of file on line $line");
+			$this->exit("Unexpected end of file");
 		}
 
 		return $line;
@@ -263,7 +276,7 @@ class Parser {
 		if ($this->next(6) == "WEBVTT") {
 			$this->pos += 6;
 		} else {
-			throw new ParserException("Missing WEBVTT at beginning of file.");
+			$this->exit("Missing WEBVTT at beginning of file");
 		}		
 	}
 
@@ -291,7 +304,7 @@ class Parser {
 			$this->pos += 1;
 			$this->line++;
 		} else {
-			throw new ParserException("Expected line terminator at line {$this->line}");
+			$this->exit_expected("line terminator");
 		}
 	}
 }

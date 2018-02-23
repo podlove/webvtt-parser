@@ -71,7 +71,7 @@ Hello world\n";
 
     /**
      * @expectedException \Podlove\Webvtt\ParserException
-     * @expectedExceptionMessage Expected line terminator
+     * @expectedExceptionMessage Expected "line terminator"
      **/
     public function testMissingLineTerminator()
     {
