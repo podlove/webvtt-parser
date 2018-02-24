@@ -50,10 +50,10 @@ class Parser {
 		}
 
 		while (!$this->is_end_reached()) {
-			$this->cues[] = $this->read_block();
+			if ($block = $this->read_block()) {
+				$this->cues[] = $block;
+			}
 		}
-
-		// error_log(print_r(substr($this->content, $this->pos), true));
 
 		return [
 			'cues' => $this->cues
@@ -124,12 +124,13 @@ class Parser {
 				$this->skip_whitespace();
 				$end = $this->read_timestamp();
 				$this->skip_newline();
+			} else if (empty($line)) {
+				break;
+			} else if (self::is_first_comment_line($line)) {
+				$this->skip_note();
+				return null;
 			} else {
 				$buffer .= $line;
-
-				if (empty($line)) {
-					break;
-				}
 			}
 		} while (!$this->is_end_reached());
 
@@ -138,6 +139,19 @@ class Parser {
 			'end' => $end,
 			'text' => $buffer
 		];
+	}
+
+	/**
+	 * Is this the first line of a comment?
+	 * 
+	 * A comment startes with "NOTE", followed by a space or newline.
+	 * 
+	 * @param  string
+	 * @return boolean
+	 */
+	private static function is_first_comment_line($line)
+	{
+		return strlen($line) === 4 && $line === 'NOTE' || substr($line, 0, 5) === "NOTE" . self::SPACE;
 	}
 
 	private function read_timestamp()
@@ -208,6 +222,18 @@ class Parser {
 		}
 
 		return $int['int'];
+	}
+
+	private function skip_note()
+	{
+		if ($this->next() === self::LF) {
+			$this->pos++;
+		} else {
+			while ($this->next(2) !== self::LF . self::LF && !$this->is_end_reached()) {
+			    $this->pos++;
+			}
+		}
+		$this->skip_newline();
 	}
 
 	private function skip_whitespace()
