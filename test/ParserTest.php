@@ -49,6 +49,19 @@ Hello world\n";
         $this->assertEquals($result['cues'][0]['end'], 4953.44);
     }
 
+    public function testCueWithIdentifier()
+    {
+        $content = "WEBVTT\n\nintro\n00:00:00.000 --> 01:22:33.440
+Hello world\n";
+        $result = (new Parser())->parse($content);
+
+        $this->assertCount(1, $result['cues']);
+        $this->assertEquals($result['cues'][0]['identifier'], "intro");
+        $this->assertEquals($result['cues'][0]['text'], "Hello world");
+        $this->assertEquals($result['cues'][0]['start'], 0);
+        $this->assertEquals($result['cues'][0]['end'], 4953.44);
+    }
+
     public function testMultipleCues()
     {
         $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440

@@ -104,6 +104,7 @@ class Parser {
 		$end = 0;
 		$seen_arrow = false;
 		$buffer = "";
+		$identifier = "";
 
 		do {
 			$prev_pos = $this->pos;
@@ -129,6 +130,8 @@ class Parser {
 			} else if (self::is_first_comment_line($line)) {
 				$this->skip_note();
 				return null;
+			} else if ($block_line_no === 1) {
+				$identifier = $line;
 			} else {
 				$buffer .= $line;
 			}
@@ -137,7 +140,8 @@ class Parser {
 		return [
 			'start' => $start,
 			'end' => $end,
-			'text' => $buffer
+			'text' => $buffer,
+			'identifier' => $identifier
 		];
 	}
 
