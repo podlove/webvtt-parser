@@ -60,6 +60,36 @@ class Parser {
 		];
 	}
 
+	private function next($length = 1, $offset = 0)
+	{
+		return substr($this->content, $this->pos + $offset, $length);
+	}
+
+	/**
+	 * Reads and returns current line.
+	 * 
+	 * Advances $pos and $line.
+	 * 
+	 * @return string
+	 */
+	private function read_line()
+	{
+		$line = "";
+		
+		while (($c = $this->next()) !== self::LF && !$this->is_end_reached()) {
+		    $this->pos++;
+		    $line .= $c;
+		}
+
+		if ($this->next() === self::LF) {
+			$this->pos++;
+		} else {
+			$this->exit("Unexpected end of file");
+		}
+
+		return $line;
+	}
+
 	/**
 	 * Reads and returns current block.
 	 * 
@@ -110,36 +140,6 @@ class Parser {
 		];
 	}
 
-	private function skip_whitespace()
-	{
-		$whitespace = [
-			self::TAB,
-			self::LF,
-			self::FF,
-			self::CR,
-			self::SPACE,
-		];
-		while (in_array($this->next(), $whitespace) && !$this->is_end_reached()) {
-		    $this->pos++;
-		}
-	}
-
-	private function skip_newline()
-	{
-		while ($this->next() === self::LF && !$this->is_end_reached()) {
-		    $this->pos++;
-		}
-	}
-
-	private function skip_arrow()
-	{
-		if ($this->next(3) == '-->') {
-			$this->pos += 3;
-		} else {
-			$this->exit_expected("-->");
-		}		
-	}
-
 	private function read_timestamp()
 	{
 		$most_significant_units = 'minutes';
@@ -182,25 +182,6 @@ class Parser {
 		return $value1*60*60 + $value2*60 + $value3 + $value4/1000;
 	}
 
-	private static function is_ascii_digit($digit)
-	{
-		return preg_match("/^[0-9]$/", $digit) === 1;
-	}
-
-	private function exit($message = "Error")
-	{
-		throw new ParserException("$message at line {$this->line}, pos {$this->pos}");		
-	}
-
-	private function exit_expected($thing, $message = "")
-	{
-		if (strlen($message) > 0) {
-			$message = trim($message) . ". ";
-		}
-
-		throw new ParserException("{$message}Expected \"$thing\", got \"" . $this->next() . "\" at line {$this->line}, pos {$this->pos}");
-	}
-
 	private function read_integer()
 	{
 		if (!self::is_ascii_digit($this->next())) {
@@ -229,6 +210,36 @@ class Parser {
 		return $int['int'];
 	}
 
+	private function skip_whitespace()
+	{
+		$whitespace = [
+			self::TAB,
+			self::LF,
+			self::FF,
+			self::CR,
+			self::SPACE,
+		];
+		while (in_array($this->next(), $whitespace) && !$this->is_end_reached()) {
+		    $this->pos++;
+		}
+	}
+
+	private function skip_newline()
+	{
+		while ($this->next() === self::LF && !$this->is_end_reached()) {
+		    $this->pos++;
+		}
+	}
+
+	private function skip_arrow()
+	{
+		if ($this->next(3) == '-->') {
+			$this->pos += 3;
+		} else {
+			$this->exit_expected("-->");
+		}		
+	}
+
 	private function skip_full_stop()
 	{
 		if ($this->next() !== '.' || $this->is_end_reached()) {
@@ -243,36 +254,6 @@ class Parser {
 			$this->exit_expected("COLON (:)", "Error when parsing Timestamp");
 		}
 		$this->pos++;		
-	}
-
-	/**
-	 * Reads and returns current line.
-	 * 
-	 * Advances $pos and $line.
-	 * 
-	 * @return string
-	 */
-	private function read_line()
-	{
-		$line = "";
-		
-		while (($c = $this->next()) !== self::LF && !$this->is_end_reached()) {
-		    $this->pos++;
-		    $line .= $c;
-		}
-
-		if ($this->next() === self::LF) {
-			$this->pos++;
-		} else {
-			$this->exit("Unexpected end of file");
-		}
-
-		return $line;
-	}
-
-	private function next($length = 1, $offset = 0)
-	{
-		return substr($this->content, $this->pos + $offset, $length);
 	}
 
 	private function skip_bom()
@@ -303,14 +284,6 @@ class Parser {
 		}
 	}
 
-	private function is_end_reached() {
-		return $this->pos + 1 >= strlen($this->content);
-	}
-
-	private function is_line_end_reached() {
-		return $this->next() === self::LF;
-	}
-
 	private function skip_line_terminator()
 	{
 		if ($this->next() === self::LF) {
@@ -319,5 +292,34 @@ class Parser {
 		} else {
 			$this->exit_expected("line terminator");
 		}
+	}
+
+	private function is_end_reached()
+	{
+		return $this->pos + 1 >= strlen($this->content);
+	}
+
+	private function is_line_end_reached()
+	{
+		return $this->next() === self::LF;
+	}
+
+	private static function is_ascii_digit($digit)
+	{
+		return preg_match("/^[0-9]$/", $digit) === 1;
+	}
+
+	private function exit($message = "Error")
+	{
+		throw new ParserException("$message at line {$this->line}, pos {$this->pos}");		
+	}
+
+	private function exit_expected($thing, $message = "")
+	{
+		if (strlen($message) > 0) {
+			$message = trim($message) . ". ";
+		}
+
+		throw new ParserException("{$message}Expected \"$thing\", got \"" . $this->next() . "\" at line {$this->line}, pos {$this->pos}");
 	}
 }
