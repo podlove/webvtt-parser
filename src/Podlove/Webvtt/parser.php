@@ -49,8 +49,9 @@ class Parser {
 			return ['cues' => []];
 		}
 
-		$block = $this->read_block();
-		$this->cues[] = $block;
+		while (!$this->is_end_reached()) {
+			$this->cues[] = $this->read_block();
+		}
 
 		// error_log(print_r(substr($this->content, $this->pos), true));
 
@@ -92,8 +93,13 @@ class Parser {
 				$this->skip_arrow();
 				$this->skip_whitespace();
 				$end = $this->read_timestamp();
+				$this->skip_newline();
 			} else {
 				$buffer .= $line;
+
+				if (empty($line)) {
+					break;
+				}
 			}
 		} while (!$this->is_end_reached());
 
@@ -114,6 +120,13 @@ class Parser {
 			self::SPACE,
 		];
 		while (in_array($this->next(), $whitespace) && !$this->is_end_reached()) {
+		    $this->pos++;
+		}
+	}
+
+	private function skip_newline()
+	{
+		while ($this->next() === self::LF && !$this->is_end_reached()) {
 		    $this->pos++;
 		}
 	}
