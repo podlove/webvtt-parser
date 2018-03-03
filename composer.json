@@ -1,11 +1,20 @@
 {
     "name": "podlove/webvtt-parser",
+    "type": "library",
     "description": "PHP library to parse webvtt",
-    "keywords": ["podlove", "parser","webvtt"],
+    "homepage": "https://github.com/podlove/webvtt-parser",
+    "keywords": ["podlove", "parser", "webvtt"],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Eric Teubert",
+            "email": "eric@ericteubert.de",
+            "homepage": "https://ericteubert.de",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "php": ">=5.3.0",
-        "podlove/normalplaytime": "1.0.*"
+        "php": ">=5.3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "7.*.*"
