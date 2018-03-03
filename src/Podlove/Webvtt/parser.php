@@ -137,12 +137,40 @@ class Parser {
 			}
 		} while (!$this->is_end_reached());
 
+		list($voice, $text) = $this->extract_voice_from_text($buffer);
+
 		return [
 			'start' => $start,
 			'end' => $end,
-			'text' => $buffer,
-			'identifier' => $identifier
+			'text' => $text,
+			'identifier' => $identifier,
+			'voice' => $voice
 		];
+	}
+
+	/**
+	 * Simplistic cue text parsing.
+	 * 
+	 * Want to do it properly?
+	 * @see  https://w3c.github.io/webvtt/#webvtt-cue-text-parsing-rules
+	 * 
+	 * @param  string $text
+	 * @return [string, string]
+	 */
+	private function extract_voice_from_text($text)
+	{
+		$voice = "";
+
+		if (substr($text, 0, 2) !== '<v')
+			return [$voice, $text];
+
+		if (!preg_match("/<v[^\s]*[\s]+([^>]+)>(.*)/", $text, $matches))
+			return [$voice, $text];
+
+		$voice = trim($matches[1]);
+		$text = trim($matches[2]);
+
+		return [$voice, $text];
 	}
 
 	/**

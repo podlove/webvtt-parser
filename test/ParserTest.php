@@ -49,6 +49,26 @@ Hello world\n";
         $this->assertEquals($result['cues'][0]['end'], 4953.44);
     }
 
+    public function testCueWithVoice()
+    {
+        $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
+<v Eric Teubert>Hello world\n";
+        $result = (new Parser())->parse($content);
+
+        $this->assertEquals($result['cues'][0]['voice'], "Eric Teubert");
+        $this->assertEquals($result['cues'][0]['text'], "Hello world");
+    }
+
+    public function testCueWithClassyVoice()
+    {
+        $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
+<v.somestyle Eric Teubert>Hello world\n";
+        $result = (new Parser())->parse($content);
+
+        $this->assertEquals($result['cues'][0]['voice'], "Eric Teubert");
+        $this->assertEquals($result['cues'][0]['text'], "Hello world");
+    }
+
     public function testCueWithIdentifier()
     {
         $content = "WEBVTT\n\nintro\n00:00:00.000 --> 01:22:33.440
