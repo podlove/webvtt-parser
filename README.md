@@ -13,22 +13,20 @@ use Podlove\Webvtt\ParserException;
 $parser = new Podlove\Webvtt\Parser();
 $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440\nHello world\n\n01:22:33.440 --> 01:22:34.440\nHi again\n";
 $result = $parser->parse($content);
-/**
-=> [
-     "cues" => [
-       [
-         "start" => 0,
-         "end" => 4953.44,
-         "text" => "Hello world",
-         "identifier" => "",
-       ],
-       [
-         "start" => 4953.44,
-         "end" => 4954.44,
-         "text" => "Hi again",
-         "identifier" => "",
-       ],
-     ],
-   ]
- **/
+// [
+//   "cues" => [
+//     [
+//       "start" => 0,
+//       "end" => 4953.44,
+//       "text" => "Hello world",
+//       "identifier" => "",
+//     ],
+//     [
+//       "start" => 4953.44,
+//       "end" => 4954.44,
+//       "text" => "Hi again",
+//       "identifier" => "",
+//     ],
+//   ],
+// ]
 ```
