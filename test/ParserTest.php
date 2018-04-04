@@ -140,6 +140,27 @@ Hello world\n";
         $result = (new Parser())->parse("WEBVTT");
     }
 
+    /**
+     * @expectedException \Podlove\Webvtt\ParserException
+     * @expectedExceptionMessage missing cue timings
+     **/
+    public function testSpecialCase()
+    {
+        $content = "WEBVTT\n\n00:09:43.101 --> 00:09:45.800
+<v andreasbogk>foo.,
+
+[00:09:45-8 @timpritlove] bar.
+n
+00:09:56.601 --> 00:10:05.400
+<v andreasbogk>baz.
+
+00:10:05.401 --> 00:10:14.200
+<v andreasbogk>hey
+";
+
+        $result = (new Parser())->parse($content);
+    }
+
     private static function empty_result()
     {
         return [

@@ -132,6 +132,8 @@ class Parser {
 				return null;
 			} else if ($block_line_no === 1) {
 				$identifier = $line;
+			} else if ($block_line_no > 1 && $identifier && !$start && !$end) {
+				$this->exit("missing cue timings");
 			} else {
 				$buffer .= $line;
 			}
