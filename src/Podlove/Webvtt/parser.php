@@ -81,6 +81,8 @@ class Parser {
 		    $line .= $c;
 		}
 
+		$this->line++;
+
 		if ($this->next() === self::LF) {
 			$this->pos++;
 		} else {

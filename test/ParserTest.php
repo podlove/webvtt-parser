@@ -124,7 +124,7 @@ Hello world\n";
 
     /**
      * @expectedException \Podlove\Webvtt\ParserException
-     * @expectedExceptionMessage Missing WEBVTT at beginning of file
+     * @expectedExceptionMessage Missing WEBVTT at beginning of file at line 1
      **/
     public function testMissingWEBVTT()
     {
@@ -142,7 +142,7 @@ Hello world\n";
 
     /**
      * @expectedException \Podlove\Webvtt\ParserException
-     * @expectedExceptionMessage missing cue timings
+     * @expectedExceptionMessage missing cue timings at line 8
      **/
     public function testSpecialCase()
     {
