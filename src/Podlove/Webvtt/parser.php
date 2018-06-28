@@ -141,6 +141,10 @@ class Parser {
 			}
 		} while (!$this->is_end_reached());
 
+		if (!empty($identifier) && !$seen_arrow) {
+			$this->exit("Cue identifier cannot be standalone.");
+		}
+
 		list($voice, $text) = $this->extract_voice_from_text($buffer);
 
 		return [

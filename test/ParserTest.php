@@ -161,6 +161,23 @@ n
         $result = (new Parser())->parse($content);
     }
 
+    /**
+     * @expectedException \Podlove\Webvtt\ParserException
+     * @expectedExceptionMessage Cue identifier cannot be standalone.
+     **/
+    public function testStandaloneIdentifier()
+    {
+        $content = "WEBVTT
+
+00:11.000 --> 00:13.000
+<v Roger Bingham>We are in New York City
+
+[01:45:07-2 Outro]
+";
+
+        $result = (new Parser())->parse($content);
+    }
+
     private static function empty_result()
     {
         return [
