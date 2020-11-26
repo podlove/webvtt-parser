@@ -20,6 +20,6 @@
         "phpunit/phpunit": "7.*.*"
     },
     "autoload": {
-        "psr-0": { "Podlove\\Webvtt": "src/" }
+        "psr-4": { "Podlove\\Webvtt\\": "src/" }
     }
 }
