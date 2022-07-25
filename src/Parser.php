@@ -180,7 +180,7 @@ class Parser
             return [$voice, $text];
         }
 
-        if (!preg_match('/<v[^\\s]*[\\s]+([^>]+)>(.*)/', $text, $matches)) {
+        if (!preg_match('/<v[^\\s]*[\\s]+([^>]+)>(.*?)(<\/v[^>]*>|$)/', $text, $matches)) {
             return [$voice, $text];
         }
 

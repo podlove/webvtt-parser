@@ -87,6 +87,16 @@ Hello & world\n\n\n\n\n\n\n";
         $this->assertEquals($result['cues'][0]['text'], 'Hello world');
     }
 
+    public function testCueWithVoiceAndClosingVoice()
+    {
+        $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
+<v Eric Teubert>Hello world</v>\n";
+        $result = (new Parser())->parse($content);
+
+        $this->assertEquals($result['cues'][0]['voice'], 'Eric Teubert');
+        $this->assertEquals($result['cues'][0]['text'], 'Hello world');
+    }
+
     public function testCueWithClassyVoice()
     {
         $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
