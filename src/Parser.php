@@ -78,17 +78,15 @@ class Parser
     {
         $line = '';
 
-        while (($c = $this->next()) !== self::LF && !$this->is_end_reached()) {
+        while (($c = $this->next()) !== self::LF && $this->pos < strlen($this->content)) {
             ++$this->pos;
             $line .= $c;
         }
 
         ++$this->line;
 
-        if ($this->next() === self::LF) {
+        if ($c === self::LF) {
             ++$this->pos;
-        } else {
-            $this->exit('Unexpected end of file');
         }
 
         return $line;
@@ -182,7 +180,7 @@ class Parser
             return [$voice, $text];
         }
 
-        if (!preg_match('/<v[^\\s]*[\\s]+([^>]+)>(.*)/', $text, $matches)) {
+        if (!preg_match('/<v[^\\s]*[\\s]+([^>]+)>(.*?)(<\/v[^>]*>|$)/', $text, $matches)) {
             return [$voice, $text];
         }
 

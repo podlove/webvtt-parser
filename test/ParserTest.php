@@ -53,6 +53,18 @@ Hello world\n";
         $this->assertEquals(count($result['cues']), 1);
     }
 
+    public function testSimpleCueWithoutTrailingNewline()
+    {
+        $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
+Hello world";
+        $result = (new Parser())->parse($content);
+
+        $this->assertEquals($result['cues'][0]['text'], 'Hello world');
+        $this->assertEquals($result['cues'][0]['start'], 0);
+        $this->assertEquals($result['cues'][0]['end'], 4953.44);
+        $this->assertEquals(count($result['cues']), 1);
+    }
+
     public function testSimpleCueWithTrailingNewlines()
     {
         $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
@@ -69,6 +81,16 @@ Hello & world\n\n\n\n\n\n\n";
     {
         $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
 <v Eric Teubert>Hello world\n";
+        $result = (new Parser())->parse($content);
+
+        $this->assertEquals($result['cues'][0]['voice'], 'Eric Teubert');
+        $this->assertEquals($result['cues'][0]['text'], 'Hello world');
+    }
+
+    public function testCueWithVoiceAndClosingVoice()
+    {
+        $content = "WEBVTT\n\n00:00:00.000 --> 01:22:33.440
+<v Eric Teubert>Hello world</v>\n";
         $result = (new Parser())->parse($content);
 
         $this->assertEquals($result['cues'][0]['voice'], 'Eric Teubert');
